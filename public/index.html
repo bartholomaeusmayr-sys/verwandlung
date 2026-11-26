@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lektüre-Check: Die Verwandlung</title>
+<style>
+:root{
+  --bg:#f5f3ee; --card:#fff; --ink:#1f2328; --muted:#5f6670; --line:#dcd8cf; --accent:#2f5d50; --accent-ink:#fff;
+  --ok:#1e7a46; --ok-bg:#e3f3e9; --warn:#9a6400; --warn-bg:#fbf0d9; --bad:#b42318; --bad-bg:#fbe7e5; --soft:#eef2f0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header.top{background:var(--accent);color:var(--accent-ink);padding:10px 16px;position:sticky;top:0;z-index:5;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+header.top .in{max-width:900px;margin:auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header.top h1{font-size:17px;margin:0;flex:1;min-width:180px;cursor:pointer}
+header.top .info{font-size:14px;opacity:.95;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.pill{background:rgba(255,255,255,.18);padding:2px 10px;border-radius:99px;white-space:nowrap}
+main{max-width:900px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin:0 0 16px}
+h2{font-size:21px;margin:0 0 10px} h3{font-size:17px;margin:0 0 8px}
+p{margin:0 0 10px} .muted{color:var(--muted)} .small{font-size:14px}
+button,.btn{font:inherit;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:9px 16px;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-block}
+button.sec,.btn.sec{background:#fff;color:var(--accent)}
+button.danger{background:#fff;color:var(--bad);border-color:var(--bad)}
+button:disabled{opacity:.5;cursor:default}
+button.mini{padding:3px 9px;font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+input[type=text],input[type=password],input[type=number],select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;max-width:100%}
+input.code{font-size:22px;letter-spacing:4px;text-transform:uppercase;width:10ch;text-align:center}
+label.chk{display:inline-flex;gap:6px;align-items:center;margin-right:14px}
+.big{font-size:44px;font-weight:700;line-height:1.1}
+.err{color:var(--bad);font-weight:600}
+.q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:0 0 16px}
+.q .meta{font-size:13px;color:var(--muted);margin-bottom:4px;display:flex;gap:8px;flex-wrap:wrap}
+.q .frage{font-weight:600;margin-bottom:6px}
+.q .hint{font-size:14px;color:var(--muted);margin-bottom:10px}
+.tag{background:var(--soft);border-radius:6px;padding:1px 7px}
+table{border-collapse:collapse;width:100%}
+td,th{padding:8px 6px;border-top:1px solid var(--line);vertical-align:top;text-align:left}
+th{font-size:13px;color:var(--muted);font-weight:600}
+td.c,th.c{text-align:center;width:72px}
+.kp input,.mr input{width:20px;height:20px;cursor:pointer}
+.mr label{display:flex;gap:10px;align-items:flex-start;padding:8px 6px;border-top:1px solid var(--line);cursor:pointer}
+.mr label input{margin-top:2px;flex:none}
+.reihe li{display:flex;gap:8px;align-items:center;padding:7px 8px;border:1px solid var(--line);border-radius:8px;margin:6px 0;background:#fbfaf7}
+.reihe ol{padding:0;margin:0;list-style:none;counter-reset:r}
+.reihe li::before{counter-increment:r;content:counter(r)".";font-weight:700;width:22px;flex:none}
+.reihe li span{flex:1}
+.reihe li button{padding:2px 9px}
+.zu .zrow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.zu .zrow span{flex:1;min-width:200px;font-style:italic}
+.status{font-weight:700;border-radius:6px;padding:1px 8px;font-size:14px}
+.st-richtig{background:var(--ok-bg);color:var(--ok)} .st-teilweise{background:var(--warn-bg);color:var(--warn)} .st-falsch{background:var(--bad-bg);color:var(--bad)}
+.q.kor-richtig{border-left:5px solid var(--ok)} .q.kor-teilweise{border-left:5px solid var(--warn)} .q.kor-falsch{border-left:5px solid var(--bad)}
+tr.wrong td{background:#fff7f6} .yes{color:var(--ok);font-weight:700} .no{color:var(--bad);font-weight:700}
+.why{background:#f7f5ef;border-left:3px solid var(--accent);padding:8px 10px;margin:4px 0 8px;font-size:15px;border-radius:0 6px 6px 0}
+.why b{color:var(--accent)}
+details.beleg summary{cursor:pointer;font-size:13px;color:var(--muted)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px} .cols ol{margin:4px 0;padding-left:22px}
+.cols li.bad{color:var(--bad)}
+.stickybar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 35%);padding:18px 0 10px;display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.tbl td,.tbl th{font-size:15px} .tbl tr:hover td{background:#faf9f5}
+.codebox{font-size:40px;font-weight:800;letter-spacing:6px;color:var(--accent)}
+.np{display:inline-block;min-width:110px;text-align:center;padding:12px 16px;border-radius:12px;background:var(--soft)}
+.np .big{color:var(--accent)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;overflow:auto;padding:24px 12px}
+.modal .box{max-width:900px;margin:auto;background:var(--bg);border-radius:12px;padding:16px}
+.keyrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px}
+.keyrow label{font-size:13px;color:var(--muted)} .keyrow input{width:70px}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;z-index:30}
+@media (max-width:600px){ header.top h1{font-size:15px;min-width:0} header.top{padding:8px 12px} header.top .info{gap:8px;font-size:13px} main{padding:12px} .q{padding:14px 12px} .cols{grid-template-columns:1fr} td.c,th.c{width:54px} .big{font-size:36px} .codebox{font-size:30px} }
+@media print{ header.top,.stickybar,.noprint{display:none!important} body{background:#fff} .q,.card{break-inside:avoid;border-color:#bbb} main{max-width:none} }
+</style>
+</head>
+<body>
+<header class="top"><div class="in"><h1 id="home">📖 Lektüre-Check: Kafka, „Die Verwandlung“</h1><div class="info" id="hinfo"></div></div></header>
+<main id="app"></main>
+<script>
+'use strict';
+// ---------- Helfer ----------
+const $ = (s, el = document) => el.querySelector(s);
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (k === 'class') el.className = v;
+    else if (k === 'html') el.innerHTML = v;
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return el;
+}
+const ROM = { 1: 'I', 2: 'II', 3: 'III' };
+const TYPNAME = { kprim: 'Richtig/Falsch (Kprim)', mr: 'Mehrfachauswahl', reihe: 'Reihenfolge', zuordnung: 'Zuordnung' };
+const HINWEIS = {
+  kprim: 'Entscheide bei jeder Aussage: richtig oder falsch.',
+  mr: 'Kreuze alle zutreffenden Antworten an. Es können eine oder mehrere richtig sein.',
+  reihe: 'Bring die Ereignisse mit den Pfeilen in die richtige Reihenfolge.',
+  zuordnung: 'Wähle zu jedem Zitat die passende Figur. Eine Figur kann mehrmals vorkommen.',
+};
+const de = (x) => String(x).replace('.', ',');
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+function toast(msg) { const t = h('div', { class: 'toast' }, msg); document.body.append(t); setTimeout(() => t.remove(), 2600); }
+async function api(path, opt = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (opt.lehrer) headers['X-Lehrer-Token'] = store.get('vw_lehrer', '');
+  const r = await fetch(path, { method: opt.method || (opt.body ? 'POST' : 'GET'), headers, body: opt.body ? JSON.stringify(opt.body) : undefined });
+  let data = {}; try { data = await r.json(); } catch {}
+  if (!r.ok) { const e = new Error(data.fehler || 'Verbindungsfehler'); e.status = r.status; throw e; }
+  return data;
+}
+const app = $('#app');
+function view(...nodes) { stopTimers(); app.replaceChildren(...nodes.flat().filter((n) => n != null && n !== '' && n !== false)); window.scrollTo(0, 0); }
+function setInfo(...nodes) { $('#hinfo').replaceChildren(...nodes.flat()); }
+let timers = [];
+function stopTimers() { timers.forEach(clearInterval); timers = []; }
+$('#home').onclick = () => { if (quiz && quiz.modus === 'pruefung' && !quiz.fertig) return; location.hash = ''; route(); };
+
+// ---------- Startseite ----------
+async function startseite() {
+  setInfo();
+  let meta = { uebenAktiv: true };
+  try { meta = await api('/api/meta'); } catch {}
+  const aktiv = store.get('vw_aktiv', null);
+  const code = new URLSearchParams(location.search).get('code') || '';
+  const msg = h('p', { class: 'err' });
+  const inp = h('input', { type: 'text', class: 'code', maxlength: 10, value: code, placeholder: 'CODE', 'aria-label': 'Prüfungscode' });
+  const join = async () => {
+    msg.textContent = '';
+    const c = inp.value.trim().toUpperCase(); if (!c) return;
+    const alt = store.get('vw_teilnahmen', {})[c];
+    if (alt) { try { const s = await api('/api/pruefung/status', { body: { token: alt } }); return pruefungStarten(alt, s); } catch {} }
+    try { const s = await api('/api/pruefung/beitreten', { body: { code: c } }); const tn = store.get('vw_teilnahmen', {}); tn[c] = s.token; store.set('vw_teilnahmen', tn); pruefungStarten(s.token, s); }
+    catch (e) { msg.textContent = e.message; }
+  };
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') join(); });
+  const uebenKarte = meta.uebenAktiv ? h('div', { class: 'card' },
+    h('h2', null, '🔀 Üben'),
+    h('p', null, 'Jedes Mischen stellt eine neue Auswahl zusammen: etwa 60 % Textkenntnis (AFB I), 30 % Zusammenhänge (AFB II), 10 % Deutung (AFB III). Nach dem Auswerten siehst du zu jedem Fehler eine Erklärung mit Textstelle.'),
+    h('div', { class: 'row' },
+      h('button', { onclick: () => uebenStarten(0) }, 'Durchmischen: ganzes Werk (24 Fragen)')),
+    h('p', { class: 'small muted', style: 'margin-top:10px' }, 'Nur ein Kapitel üben (10 Fragen):'),
+    h('div', { class: 'row' }, [1, 2, 3].map((k) => h('button', { class: 'sec', onclick: () => uebenStarten(k) }, 'Kapitel ' + ROM[k]))))
+    : h('div', { class: 'card' }, h('h2', null, '🔀 Üben'), h('p', { class: 'muted' }, 'Der Übungsmodus ist gerade gesperrt, zum Beispiel weil eine Prüfung läuft.'));
+  view(
+    aktiv ? h('div', { class: 'card', style: 'border-color:var(--accent)' }, h('h3', null, 'Laufende Prüfung'), h('p', null, 'Auf diesem Gerät ist eine Prüfung noch nicht abgegeben.'), h('button', { onclick: async () => { try { const s = await api('/api/pruefung/status', { body: { token: aktiv } }); pruefungStarten(aktiv, s); } catch (e) { store.del('vw_aktiv'); toast(e.message); startseite(); } } }, 'Prüfung fortsetzen')) : '',
+    h('div', { class: 'grid3' },
+      uebenKarte,
+      h('div', { class: 'card' },
+        h('h2', null, '📝 Prüfung'),
+        h('p', null, 'Gib den Code ein, den deine Lehrkraft dir nennt. Du bekommst eine Prüfungsnummer zugeteilt, dein Name wird nicht abgefragt.'),
+        h('div', { class: 'row' }, inp, h('button', { onclick: join }, 'Beitreten')), msg)),
+    h('p', { class: 'small muted', style: 'text-align:center' }, h('a', { href: '#lehrkraft' }, 'Bereich für Lehrkräfte')),
+  );
+  if (code) inp.focus();
+}
+
+// ---------- Quiz (Üben & Prüfung) ----------
+let quiz = null; // {modus, fragen, antworten, salt, set, token, ...}
+async function uebenStarten(kap) {
+  try {
+    const d = await api('/api/ueben/neu', { body: { kapitel: kap } });
+    quiz = { modus: 'ueben', kap, fragen: d.fragen, set: d.set, salt: d.salt, antworten: {} };
+    quizAnzeigen();
+  } catch (e) { toast(e.message); }
+}
+function pruefungStarten(token, s) {
+  if (s.abgegeben) { store.del('vw_aktiv'); quiz = { modus: 'pruefung', token, nr: s.nr, titel: s.titel, fertig: true }; return ergebnisPruefung(s); }
+  store.set('vw_aktiv', token);
+  const lokal = store.get('vw_antw_' + token, {});
+  quiz = { modus: 'pruefung', token, nr: s.nr, titel: s.titel, fragen: s.fragen, antworten: Object.assign({}, s.antworten, lokal), deadline: s.deadline, offset: s.jetzt - Date.now() };
+  quizAnzeigen();
+}
+function bearbeitet(q, a) {
+  if (!a) return false;
+  if (q.typ === 'kprim') return q.items.every((it) => typeof a[it.k] === 'boolean');
+  if (q.typ === 'mr') return !!a.beruehrt;
+  if (q.typ === 'reihe') return Array.isArray(a.folge);
+  return q.items.every((it) => typeof a[it.k] === 'string' && a[it.k]);
+}
+let saveT = null;
+function geaendert() {
+  const n = quiz.fragen.filter((q) => bearbeitet(q, quiz.antworten[q.id])).length;
+  const z = $('#zaehler'); if (z) z.textContent = `${n} von ${quiz.fragen.length} bearbeitet`;
+  if (quiz.modus === 'pruefung') {
+    store.set('vw_antw_' + quiz.token, quiz.antworten);
+    clearTimeout(saveT); const s = $('#speicher'); if (s) s.textContent = 'speichert …';
+    saveT = setTimeout(async () => {
+      try { await api('/api/pruefung/speichern', { body: { token: quiz.token, antworten: quiz.antworten } }); if ($('#speicher')) $('#speicher').textContent = '✓ gespeichert'; }
+      catch (e) { if ($('#speicher')) $('#speicher').textContent = '⚠ ' + e.message; }
+    }, 1200);
+  }
+}
+function frageKarte(q, i) {
+  const a = quiz.antworten[q.id] || (quiz.antworten[q.id] = q.typ === 'mr' ? { wahl: [] } : {});
+  const body = h('div');
+  if (q.typ === 'kprim') {
+    body.append(h('table', { class: 'kp' }, h('tr', null, h('th', null, 'Aussage'), h('th', { class: 'c' }, 'richtig'), h('th', { class: 'c' }, 'falsch')),
+      q.items.map((it) => h('tr', null, h('td', null, it.t),
+        [true, false].map((v) => h('td', { class: 'c' }, h('input', { type: 'radio', name: q.id + it.k, 'aria-label': v ? 'richtig' : 'falsch', checked: a[it.k] === v, onchange: () => { a[it.k] = v; geaendert(); } })))))));
+  } else if (q.typ === 'mr') {
+    body.append(h('div', { class: 'mr' }, q.items.map((it) => h('label', null, h('input', { type: 'checkbox', checked: a.wahl.includes(it.k), onchange: (e) => { a.beruehrt = true; a.wahl = a.wahl.filter((k) => k !== it.k); if (e.target.checked) a.wahl.push(it.k); geaendert(); } }), h('span', null, it.t)))));
+  } else if (q.typ === 'reihe') {
+    if (!Array.isArray(a.folge)) a._start = q.items.map((it) => it.k);
+    const ol = h('ol');
+    const draw = () => {
+      const folge = a.folge || a._start;
+      ol.replaceChildren(...folge.map((k, pos) => {
+        const it = q.items.find((x) => x.k === k);
+        const mv = (d) => { const f = folge.slice(); [f[pos], f[pos + d]] = [f[pos + d], f[pos]]; a.folge = f; draw(); geaendert(); };
+        return h('li', null, h('span', null, it.t), h('button', { class: 'sec', disabled: pos === 0, 'aria-label': 'nach oben', onclick: () => mv(-1) }, '▲'), h('button', { class: 'sec', disabled: pos === folge.length - 1, 'aria-label': 'nach unten', onclick: () => mv(1) }, '▼'));
+      }));
+    };
+    draw();
+    body.append(h('div', { class: 'reihe' }, ol, h('p', { class: 'small muted', style: 'margin:6px 0 0' }, 'Die Aufgabe zählt als bearbeitet, sobald du mindestens einmal etwas verschoben hast.')));
+  } else {
+    body.append(h('div', { class: 'zu' }, q.items.map((it) => h('div', { class: 'zrow' }, h('span', null, it.t),
+      h('select', { onchange: (e) => { a[it.k] = e.target.value; geaendert(); } }, h('option', { value: '' }, '– bitte wählen –'), q.kategorien.map((c) => h('option', { value: c, selected: a[it.k] === c }, c)))))));
+  }
+  return h('div', { class: 'q', id: 'q-' + q.id },
+    h('div', { class: 'meta' }, h('b', null, `Aufgabe ${i + 1}`), h('span', { class: 'tag' }, 'Kapitel ' + ROM[q.kap])),
+    h('div', { class: 'frage' }, q.frage), h('div', { class: 'hint' }, HINWEIS[q.typ]), body);
+}
+function quizAnzeigen() {
+  const ist = quiz.modus === 'pruefung';
+  const info = [h('span', { class: 'pill', id: 'zaehler' }, '')];
+  if (ist) { info.unshift(h('span', { class: 'pill' }, 'Prüfungsnummer ' + quiz.nr)); info.push(h('span', { id: 'speicher', class: 'small' }, '')); }
+  if (ist && quiz.deadline) info.push(h('span', { class: 'pill', id: 'uhr' }, ''));
+  setInfo(...info);
+  const abgabe = h('button', { onclick: abschicken }, ist ? 'Prüfung abgeben' : 'Auswerten');
+  view(
+    h('div', { class: 'card' },
+      ist ? h('div', null, h('h2', null, quiz.titel), h('p', null, 'Deine Prüfungsnummer ist ', h('b', { style: 'font-size:20px' }, quiz.nr), '. Notiere sie dir. Deine Antworten werden automatisch gespeichert. Nach der Abgabe kannst du nichts mehr ändern.'))
+        : h('div', null, h('h2', null, quiz.kap ? `Übung: Kapitel ${ROM[quiz.kap]}` : 'Übung: ganzes Werk'), h('p', { class: 'muted' }, 'Beantworte alle Aufgaben und klicke dann auf „Auswerten“. Teilpunkte gibt es, wenn nur eine Entscheidung falsch ist.'))),
+    quiz.fragen.map(frageKarte),
+    h('div', { class: 'stickybar' }, !ist ? h('button', { class: 'sec', onclick: () => { if (confirm('Neue Fragen mischen? Deine Antworten gehen verloren.')) uebenStarten(quiz.kap); } }, 'Neu durchmischen') : '', abgabe),
+  );
+  geaendert(); if ($('#speicher')) $('#speicher').textContent = '';
+  if (ist && quiz.deadline) {
+    const tick = () => {
+      const rest = quiz.deadline - (Date.now() + quiz.offset);
+      const u = $('#uhr'); if (!u) return;
+      if (rest <= 0) { u.textContent = 'Zeit abgelaufen'; stopTimers(); abschicken(true); return; }
+      const m = Math.floor(rest / 60000), s = Math.floor((rest % 60000) / 1000);
+      u.textContent = `⏱ ${m}:${String(s).padStart(2, '0')}`;
+      u.style.background = rest < 120000 ? '#b42318' : '';
+    };
+    tick(); timers.push(setInterval(tick, 1000));
+  }
+}
+async function abschicken(auto) {
+  const offen = quiz.fragen.filter((q) => !bearbeitet(q, quiz.antworten[q.id])).length;
+  if (auto !== true) {
+    const t = quiz.modus === 'pruefung' ? 'Prüfung jetzt endgültig abgeben?' : 'Jetzt auswerten?';
+    if (!confirm(offen ? `${t}\n\nNoch nicht bearbeitet: ${offen} Aufgabe(n).` : t)) return;
+  }
+  const antworten = {};
+  for (const [k, v] of Object.entries(quiz.antworten)) { const c = Object.assign({}, v); delete c._start; antworten[k] = c; }
+  try {
+    if (quiz.modus === 'ueben') {
+      const r = await api('/api/ueben/auswerten', { body: { set: quiz.set, salt: quiz.salt, antworten } });
+      ergebnisAnzeigen(r, { ueben: true });
+    } else {
+      clearTimeout(saveT);
+      const s = await api('/api/pruefung/abgeben', { body: { token: quiz.token, antworten } });
+      store.del('vw_aktiv'); store.del('vw_antw_' + quiz.token); quiz.fertig = true;
+      ergebnisPruefung(s);
+    }
+  } catch (e) { toast(e.message); }
+}
+function npBox(r) {
+  return h('div', { class: 'row', style: 'gap:18px' },
+    h('div', { class: 'np' }, h('div', { class: 'big' }, r.np), h('div', { class: 'small muted' }, 'Notenpunkte')),
+    h('div', null, h('p', { style: 'margin:0' }, h('b', null, `${de(r.punkte)} von ${r.max} Punkten`), ` (${de(r.prozent)} %)`), h('p', { class: 'small muted', style: 'margin:0' }, 'Pro Aufgabe 1 Punkt, ½ Punkt bei genau einer falschen Entscheidung.')));
+}
+function ergebnisPruefung(s) {
+  setInfo(h('span', { class: 'pill' }, 'Prüfungsnummer ' + s.nr));
+  const box = h('div');
+  const zeigeKorrektur = async () => {
+    try { const r = await api('/api/pruefung/korrektur', { body: { token: quiz.token } }); box.replaceChildren(korrekturListe(r.details)); }
+    catch (e) { box.replaceChildren(h('p', { class: 'err' }, e.message), h('button', { class: 'sec', onclick: zeigeKorrektur }, 'Erneut versuchen')); }
+  };
+  view(h('div', { class: 'card' }, h('h2', null, 'Abgegeben ✓'), h('p', null, s.titel, ' · Prüfungsnummer ', h('b', null, s.nr)), npBox(s.ergebnis),
+    h('div', { class: 'row', style: 'margin-top:14px' }, s.korrekturFrei ? h('button', { onclick: zeigeKorrektur }, 'Korrektur anzeigen') : h('div', null, h('p', { class: 'muted' }, 'Die Korrektur wird freigeschaltet, sobald die Lehrkraft die Prüfung beendet.'), h('button', { class: 'sec', onclick: zeigeKorrektur }, 'Korrektur abrufen')))), box);
+}
+function ergebnisAnzeigen(r, opt) {
+  setInfo(h('span', { class: 'pill' }, `${de(r.punkte)}/${r.max} P. · ${r.np} NP`));
+  view(h('div', { class: 'card' }, h('h2', null, 'Auswertung'), npBox(r),
+    h('div', { class: 'row', style: 'margin-top:14px' }, h('button', { onclick: () => uebenStarten(quiz.kap) }, 'Neu durchmischen'), h('button', { class: 'sec', onclick: () => { location.hash = ''; route(); } }, 'Zur Startseite'))),
+  korrekturListe(r.details));
+}
+
+// ---------- Korrekturansicht ----------
+const STXT = { richtig: '✓ richtig', teilweise: '◐ teilweise richtig', falsch: '✗ falsch' };
+function korrekturListe(details, opt = {}) {
+  const wrap = h('div');
+  const nurFehler = h('input', { type: 'checkbox', onchange: () => draw() });
+  const draw = () => {
+    wrap.replaceChildren(...details.filter((d) => !nurFehler.checked || d.status !== 'richtig').map((d, i) => korrekturKarte(d, details.indexOf(d), opt)));
+  };
+  draw();
+  const nF = details.filter((d) => d.status !== 'richtig').length;
+  return h('div', null, h('div', { class: 'row noprint', style: 'margin:0 0 10px' }, h('label', { class: 'chk' }, nurFehler, `nur Aufgaben mit Fehlern zeigen (${nF})`)), wrap);
+}
+function beleg(text, offen) {
+  return offen ? h('div', { class: 'why' }, h('b', null, 'Erklärung: '), text) : h('details', { class: 'beleg' }, h('summary', null, 'Textbeleg'), h('div', { class: 'why' }, text));
+}
+function korrekturKarte(d, i, opt) {
+  const kopf = h('div', { class: 'meta' }, h('b', null, opt.pool ? d.id : `Aufgabe ${i + 1}`), h('span', { class: 'tag' }, 'Kapitel ' + ROM[d.kap]), h('span', { class: 'tag' }, 'AFB ' + ROM[d.afb]), opt.pool ? h('span', { class: 'tag' }, TYPNAME[d.typ]) : h('span', { class: 'tag' }, d.id),
+    opt.pool ? '' : h('span', { class: 'status st-' + d.status }, `${STXT[d.status]} · ${de(d.punkte)} P.`));
+  const body = h('div');
+  if (d.typ === 'kprim' || d.typ === 'mr') {
+    const lab = d.typ === 'kprim' ? (v) => (v === true ? 'richtig' : v === false ? 'falsch' : '–') : (v) => (v ? 'ja' : 'nein');
+    const sol = d.typ === 'kprim' ? (v) => (v ? 'richtig' : 'falsch') : (v) => (v ? 'trifft zu' : 'trifft nicht zu');
+    const t = h('table', null, h('tr', null, h('th', null, d.typ === 'kprim' ? 'Aussage' : 'Antwort'), opt.pool ? '' : h('th', null, d.typ === 'mr' ? 'Angekreuzt?' : 'Deine Antwort'), h('th', null, 'Lösung')));
+    d.items.forEach((it) => {
+      t.append(h('tr', { class: !opt.pool && !it.richtig ? 'wrong' : '' }, h('td', null, it.t), opt.pool ? '' : h('td', { class: it.richtig ? 'yes' : 'no' }, (it.richtig ? '✓ ' : '✗ ') + lab(it.gegeben)), h('td', null, h('b', null, sol(it.loesung)))));
+      t.append(h('tr', null, h('td', { colspan: 3, style: 'border-top:0;padding-top:0' }, beleg(it.why, !opt.pool && !it.richtig))));
+    });
+    body.append(t);
+  } else if (d.typ === 'zuordnung') {
+    const t = h('table', null, h('tr', null, h('th', null, 'Zitat'), opt.pool ? '' : h('th', null, 'Deine Zuordnung'), h('th', null, 'Lösung')));
+    d.items.forEach((it) => {
+      t.append(h('tr', { class: !opt.pool && !it.richtig ? 'wrong' : '' }, h('td', { style: 'font-style:italic' }, it.t), opt.pool ? '' : h('td', { class: it.richtig ? 'yes' : 'no' }, (it.richtig ? '✓ ' : '✗ ') + (it.gegeben || '–')), h('td', null, h('b', null, it.loesung))));
+      t.append(h('tr', null, h('td', { colspan: 3, style: 'border-top:0;padding-top:0' }, beleg(it.why, !opt.pool && !it.richtig))));
+    });
+    body.append(t);
+  } else {
+    const richtigeFolge = h('ol', null, d.loesung.map((t) => h('li', null, t)));
+    if (opt.pool) body.append(richtigeFolge);
+    else body.append(h('div', { class: 'cols' },
+      h('div', null, h('b', null, 'Deine Reihenfolge'), d.bearbeitet ? h('ol', null, d.gegeben.map((t, pos) => h('li', { class: t === d.loesung[pos] ? '' : 'bad' }, t))) : h('p', { class: 'muted' }, 'nicht bearbeitet')),
+      h('div', null, h('b', null, 'Richtige Reihenfolge'), richtigeFolge)));
+    body.append(beleg(d.erkl, !opt.pool && d.status !== 'richtig'));
+  }
+  return h('div', { class: 'q' + (opt.pool ? '' : ' kor-' + d.status) }, kopf, h('div', { class: 'frage' }, d.frage), body);
+}
+
+// ---------- Lehrkraft ----------
+async function lehrerLogin() {
+  setInfo();
+  const pw = h('input', { type: 'password', placeholder: 'Passwort', autocomplete: 'current-password' });
+  const msg = h('p', { class: 'err' });
+  const go = async () => { try { const r = await api('/api/lehrer/login', { body: { passwort: pw.value } }); store.set('vw_lehrer', r.token); route(); } catch (e) { msg.textContent = e.message; } };
+  pw.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+  view(h('div', { class: 'card', style: 'max-width:460px;margin:auto' }, h('h2', null, 'Anmeldung Lehrkraft'), h('p', { class: 'muted small' }, 'Das Passwort steht beim Start des Servers in der Konsole oder wurde über LEHRER_PASSWORT festgelegt.'), h('div', { class: 'row' }, pw, h('button', { onclick: go }, 'Anmelden')), msg));
+  pw.focus();
+}
+async function lapi(path, opt) {
+  try { return await api(path, Object.assign({ lehrer: true }, opt)); }
+  catch (e) { if (e.status === 401) { store.del('vw_lehrer'); lehrerLogin(); } throw e; }
+}
+async function lehrerDashboard() {
+  let d; try { d = await lapi('/api/lehrer/pruefungen'); } catch (e) { return; }
+  setInfo(h('a', { href: '#pool', class: 'pill', style: 'color:#fff' }, 'Aufgabenpool'), h('a', { href: '#', class: 'pill', style: 'color:#fff', onclick: (e) => { e.preventDefault(); store.del('vw_lehrer'); location.hash = ''; route(); } }, 'Abmelden'));
+  const meta = await api('/api/meta');
+  // Formular
+  const titel = h('input', { type: 'text', value: 'Lektüretest „Die Verwandlung“', style: 'width:100%' });
+  const anzahl = h('input', { type: 'number', min: 5, max: 60, value: 24, style: 'width:80px' });
+  const dauer = h('input', { type: 'number', min: 0, max: 300, value: 0, style: 'width:80px' });
+  const kaps = [1, 2, 3].map((k) => h('input', { type: 'checkbox', checked: true, value: k }));
+  const gleiche = h('select', null, h('option', { value: '0' }, 'jede/r bekommt eine eigene Mischung'), h('option', { value: '1' }, 'alle bekommen dieselben Fragen'));
+  const korr = h('select', null, h('option', { value: 'sofort' }, 'sofort nach der Abgabe'), h('option', { value: 'nachEnde' }, 'erst wenn ich die Prüfung beende'));
+  const teil = h('input', { type: 'checkbox', checked: true });
+  const keys = meta.standardSchluessel.map((v, i) => h('input', { type: 'number', min: 0, max: 100, value: v }));
+  const msg = h('p', { class: 'err' });
+  const erstellen = async () => {
+    msg.textContent = '';
+    try {
+      const r = await lapi('/api/lehrer/pruefungen', { body: { titel: titel.value, anzahl: +anzahl.value, dauer: +dauer.value, kapitel: kaps.filter((c) => c.checked).map((c) => +c.value), gleicheFragen: gleiche.value === '1', korrektur: korr.value, teilpunkte: teil.checked, schluessel: keys.map((k) => +k.value) } });
+      location.hash = '#lehrkraft/' + r.code;
+    } catch (e) { msg.textContent = e.message; }
+  };
+  const ueben = h('input', { type: 'checkbox', checked: d.uebenAktiv, onchange: async (e) => { try { await lapi('/api/lehrer/ueben', { body: { aktiv: e.target.checked } }); toast(e.target.checked ? 'Übungsmodus freigegeben' : 'Übungsmodus gesperrt'); } catch (er) { toast(er.message); } } });
+  const liste = d.pruefungen.length ? h('table', { class: 'tbl' }, h('tr', null, h('th', null, 'Prüfung'), h('th', null, 'Code'), h('th', null, 'Status'), h('th', null, 'Teiln.'), h('th', null, 'Abgegeben'), h('th', null, 'Ø NP')),
+    d.pruefungen.map((p) => h('tr', { style: 'cursor:pointer', onclick: () => { location.hash = '#lehrkraft/' + p.code; } }, h('td', null, p.titel, h('div', { class: 'small muted' }, new Date(p.erstellt).toLocaleString('de-DE'))), h('td', null, h('b', null, p.code)), h('td', null, p.offen ? '🟢 offen' : '⚪ beendet'), h('td', null, p.teilnehmende), h('td', null, p.abgegeben), h('td', null, p.npSchnitt == null ? '–' : de(p.npSchnitt)))))
+    : h('p', { class: 'muted' }, 'Noch keine Prüfungen angelegt.');
+  view(
+    h('div', { class: 'card' }, h('h2', null, 'Meine Prüfungen'), liste),
+    h('div', { class: 'card' }, h('h2', null, 'Neue Prüfung anlegen'),
+      h('p', null, h('label', null, 'Titel', h('br'), titel)),
+      h('div', { class: 'row', style: 'margin-bottom:10px' }, h('label', null, 'Anzahl Aufgaben ', anzahl), h('label', null, 'Zeitlimit in Minuten (0 = ohne) ', dauer)),
+      h('p', null, 'Kapitel: ', kaps.map((c, i) => h('label', { class: 'chk' }, c, 'Kapitel ' + ROM[i + 1]))),
+      h('p', null, h('label', null, 'Fragen: ', gleiche)),
+      h('p', null, h('label', null, 'Korrektur für die Schüler: ', korr)),
+      h('p', null, h('label', { class: 'chk' }, teil, 'Teilpunkte (½ Punkt bei genau einer falschen Entscheidung)')),
+      h('details', null, h('summary', { style: 'cursor:pointer' }, 'Notenschlüssel anpassen (Mindestprozent je Notenpunkt)'),
+        h('div', { class: 'keyrow', style: 'margin-top:8px' }, keys.map((k, i) => h('label', null, `${15 - i} NP ab`, h('br'), k, ' %'))),
+        h('p', { class: 'small muted' }, 'Unter dem Wert für 1 Notenpunkt gibt es 0 Notenpunkte.')),
+      h('p', { class: 'small muted' }, 'Das Verhältnis der Anforderungsbereiche (ca. 60 % AFB I, 30 % AFB II, 10 % AFB III) und die gleichmäßige Verteilung auf die gewählten Kapitel stellt die App bei jeder Ziehung automatisch her.'),
+      h('button', { onclick: erstellen }, 'Prüfung anlegen'), msg),
+    h('div', { class: 'card' }, h('h3', null, 'Übungsmodus'), h('label', { class: 'chk' }, ueben, 'Übungsmodus für Schüler freigeben'), h('p', { class: 'small muted' }, 'Tipp: Während einer Prüfung sperren, damit nebenbei niemand Erklärungen zu Pool-Fragen nachschlagen kann.')),
+  );
+}
+async function lehrerPruefung(code) {
+  let first = true;
+  const kopf = h('div'), tabelle = h('div'), stat = h('div');
+  const laden = async () => {
+    let d; try { d = await lapi('/api/lehrer/pruefungen/' + code); } catch (e) { if (first) { toast(e.message); location.hash = '#lehrkraft'; } return; }
+    const link = `${location.origin}/?code=${d.code}`;
+    const s = d.settings;
+    kopf.replaceChildren(h('div', { class: 'card' },
+      h('div', { class: 'row', style: 'justify-content:space-between' }, h('h2', { style: 'margin:0' }, d.titel), h('span', null, d.offen ? '🟢 offen' : '⚪ beendet')),
+      h('div', { class: 'row', style: 'margin:8px 0' }, h('div', null, h('div', { class: 'small muted' }, 'Code für die Schüler'), h('div', { class: 'codebox' }, d.code)), h('div', { class: 'small' }, 'Direktlink: ', h('a', { href: link, target: '_blank' }, link), ' ', h('button', { class: 'sec mini', onclick: () => { navigator.clipboard && navigator.clipboard.writeText(link); toast('Link kopiert'); } }, 'kopieren'))),
+      h('p', { class: 'small muted' }, `${s.anzahl} Aufgaben · Kapitel ${s.kapitel.map((k) => ROM[k]).join(', ')} · ${s.dauer ? s.dauer + ' Minuten' : 'ohne Zeitlimit'} · ${s.gleicheFragen ? 'gleiche Fragen für alle' : 'individuelle Mischung'} · Korrektur ${s.korrektur === 'sofort' ? 'sofort nach Abgabe' : 'nach Prüfungsende'} · ${s.teilpunkte ? 'mit' : 'ohne'} Teilpunkte`),
+      h('div', { class: 'row' },
+        h('button', { onclick: async () => { await lapi(`/api/lehrer/pruefungen/${code}/status`, { body: { offen: !d.offen } }); laden(); } }, d.offen ? 'Prüfung beenden' : 'Prüfung wieder öffnen'),
+        h('button', { class: 'sec', onclick: async () => { if (!confirm('Alle noch nicht abgegebenen Arbeiten mit dem zuletzt gespeicherten Stand abschließen?')) return; const r = await lapi(`/api/lehrer/pruefungen/${code}/einsammeln`, { body: {} }); toast(r.eingesammelt + ' Arbeit(en) eingesammelt'); laden(); } }, 'Offene Arbeiten einsammeln'),
+        h('a', { class: 'btn sec', href: '#', onclick: async (e) => { e.preventDefault(); const r = await fetch(`/api/lehrer/pruefungen/${code}/csv`, { headers: { 'X-Lehrer-Token': store.get('vw_lehrer', '') } }); const b = await r.blob(); const a = h('a', { href: URL.createObjectURL(b), download: `Ergebnisse_${code}.csv` }); document.body.append(a); a.click(); a.remove(); } }, 'Ergebnisse als CSV'),
+        h('button', { class: 'sec', onclick: () => window.print() }, 'Drucken'),
+        h('button', { class: 'danger', onclick: async () => { if (!confirm('Prüfung mit allen Ergebnissen endgültig löschen?')) return; await lapi('/api/lehrer/pruefungen/' + code, { method: 'DELETE' }); location.hash = '#lehrkraft'; } }, 'Löschen'))));
+    const abg = d.liste.filter((t) => t.abgabe);
+    tabelle.replaceChildren(h('div', { class: 'card' }, h('h3', null, `Teilnehmende (${d.liste.length}, davon ${abg.length} abgegeben${d.npSchnitt == null ? '' : ', Ø ' + de(d.npSchnitt) + ' NP'})`),
+      d.liste.length ? h('table', { class: 'tbl' }, h('tr', null, h('th', null, 'Nr.'), h('th', null, 'Status'), h('th', null, 'Punkte'), h('th', null, '%'), h('th', null, 'Notenpunkte'), h('th', null, '')),
+        d.liste.map((t) => {
+          let st = t.abgabe ? 'abgegeben ' + new Date(t.abgabe).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : `in Bearbeitung (${t.beantwortet}/${t.anzahl})`;
+          if (!t.abgabe && t.deadline && d.jetzt > t.deadline) st += ' · Zeit abgelaufen';
+          return h('tr', null, h('td', null, h('b', null, t.nr)), h('td', null, st), h('td', null, t.ergebnis ? `${de(t.ergebnis.punkte)}/${t.ergebnis.max}` : '–'), h('td', null, t.ergebnis ? de(t.ergebnis.prozent) : '–'), h('td', null, t.ergebnis ? h('b', null, t.ergebnis.np) : '–'),
+            h('td', null, h('button', { class: 'sec mini', onclick: () => teilnahmeZeigen(code, t.nr) }, 'Antworten'), ' ', h('button', { class: 'danger mini', title: 'Teilnahme entfernen (z. B. doppelte Anmeldung)', onclick: async () => { if (!confirm(`Teilnahme Nr. ${t.nr} entfernen?`)) return; await lapi(`/api/lehrer/pruefungen/${code}/teilnahme/${t.nr}`, { method: 'DELETE' }); laden(); } }, '✕')));
+        })) : h('p', { class: 'muted' }, 'Noch niemand beigetreten. Die Liste aktualisiert sich automatisch.')));
+    stat.replaceChildren(d.statistik.length ? h('div', { class: 'card' }, h('h3', null, 'Lösungsquote je Aufgabe (schwierigste zuerst)'),
+      h('table', { class: 'tbl' }, h('tr', null, h('th', null, 'Aufgabe'), h('th', null, 'AFB'), h('th', null, 'gestellt'), h('th', null, 'Ø erreicht')),
+        d.statistik.map((x) => h('tr', null, h('td', null, h('b', null, x.id), ' ', h('span', { class: 'small muted' }, x.frage)), h('td', null, ROM[x.afb]), h('td', null, x.n), h('td', null, de(x.quote) + ' %'))))) : '');
+    first = false;
+  };
+  setInfo(h('a', { href: '#lehrkraft', class: 'pill', style: 'color:#fff' }, '← Übersicht'), h('a', { href: '#pool', class: 'pill', style: 'color:#fff' }, 'Aufgabenpool'));
+  view(kopf, tabelle, stat);
+  await laden();
+  timers.push(setInterval(laden, 5000));
+}
+async function teilnahmeZeigen(code, nr) {
+  try {
+    const r = await lapi(`/api/lehrer/pruefungen/${code}/teilnahme/${nr}`);
+    const m = h('div', { class: 'modal', onclick: (e) => { if (e.target === m) m.remove(); } },
+      h('div', { class: 'box' }, h('div', { class: 'row', style: 'justify-content:space-between;margin-bottom:10px' }, h('h2', { style: 'margin:0' }, `Prüfungsnummer ${nr}`), h('button', { class: 'sec', onclick: () => m.remove() }, 'Schließen')),
+        h('div', { class: 'card' }, npBox(r), h('p', { class: 'small muted', style: 'margin-top:8px' }, r.abgabe ? 'Abgegeben: ' + new Date(r.abgabe).toLocaleString('de-DE') : 'Noch nicht abgegeben – vorläufige Auswertung des gespeicherten Stands.')),
+        korrekturListe(r.details)));
+    document.body.append(m);
+  } catch (e) { toast(e.message); }
+}
+async function poolAnzeigen() {
+  let pool; try { pool = await lapi('/api/lehrer/pool'); } catch { return; }
+  setInfo(h('a', { href: '#lehrkraft', class: 'pill', style: 'color:#fff' }, '← Übersicht'));
+  const fk = h('select', null, h('option', { value: '' }, 'alle Kapitel'), [1, 2, 3].map((k) => h('option', { value: k }, 'Kapitel ' + ROM[k])));
+  const fa = h('select', null, h('option', { value: '' }, 'alle AFB'), [1, 2, 3].map((k) => h('option', { value: k }, 'AFB ' + ROM[k])));
+  const liste = h('div');
+  const draw = () => {
+    const sel = pool.filter((q) => (!fk.value || q.kap == fk.value) && (!fa.value || q.afb == fa.value));
+    liste.replaceChildren(...sel.map((q) => korrekturKarte(q.typ === 'reihe' ? { ...q, loesung: q.items } : { ...q, items: q.items.map((it) => ({ ...it, loesung: it.ok })) }, 0, { pool: true })));
+  };
+  fk.onchange = fa.onchange = draw;
+  view(h('div', { class: 'card noprint' }, h('h2', null, `Aufgabenpool (${pool.length} Aufgaben)`), h('p', { class: 'muted' }, 'Pro Kapitel 20 Aufgaben: 12 × AFB I, 6 × AFB II, 2 × AFB III. Hier siehst du alle Lösungen und Textbelege.'), h('div', { class: 'row' }, fk, fa, h('button', { class: 'sec', onclick: () => window.print() }, 'Drucken / PDF'))), liste);
+  draw();
+}
+
+// ---------- Routing ----------
+async function route() {
+  document.querySelectorAll('.modal').forEach((m) => m.remove());
+  const hsh = location.hash.replace(/^#/, '');
+  if (hsh.startsWith('lehrkraft') || hsh === 'pool') {
+    if (!store.get('vw_lehrer', '')) return lehrerLogin();
+    if (hsh === 'pool') return poolAnzeigen();
+    const code = hsh.split('/')[1];
+    return code ? lehrerPruefung(code) : lehrerDashboard();
+  }
+  const aktiv = store.get('vw_aktiv', null);
+  if (aktiv && !quiz) { try { const s = await api('/api/pruefung/status', { body: { token: aktiv } }); return pruefungStarten(aktiv, s); } catch { store.del('vw_aktiv'); } }
+  startseite();
+}
+window.addEventListener('hashchange', route);
+window.addEventListener('beforeunload', (e) => { if (quiz && !quiz.fertig && quiz.modus === 'pruefung') { e.preventDefault(); e.returnValue = ''; } });
+route();
+</script>
+</body>
+</html>
